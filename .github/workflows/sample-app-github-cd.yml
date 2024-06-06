@@ -26,7 +26,6 @@ on:
         required: true
 
 jobs:
-  # Get env if the action was triggered by a simple push
   get-env:
     name: Determine environment to deploy to
     runs-on: ubuntu-latest
@@ -43,6 +42,23 @@ jobs:
             fi
           else 
             echo "env-to-use=${{ inputs.env }}" >> "$GITHUB_OUTPUT"
+          fi
+  get-app-name:
+    name: Determine app name
+    runs-on: ubuntu-latest
+    needs: get-env
+    environment: ${{ needs.get-env.outputs.env-to-use }}
+    outputs:
+      app-name: ${{steps.get-app-name.outputs.app-name }}
+    steps:
+      - name: Determine app name
+        id: get-app-name
+        shell: bash
+        run: |
+          if [ ${{ github.event_name}} == 'workflow_call' ]; then
+            echo "app-name=${{ inputs.app-name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "app-name=${{ vars.AZURE_WEBAPP_NAME }}" >> "$GITHUB_OUTPUT"
           fi
 
   build:
@@ -89,6 +105,7 @@ jobs:
     needs:
       - build
       - get-env
+      - get-app-name
     environment: ${{ needs.get-env.outputs.env-to-use }}
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -110,6 +127,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: ${{ inputs.app-name }} || ${{ secrets.AZURE_WEBAPP_NAME }}
+          app-name: ${{ needs.get-app-name.outputs.app-name }}
           slot-name: "Production"
           package: release.zip
