@@ -20,6 +20,10 @@ on:
         description: "Environment to deploy to"
         type: string
         required: true
+      app-name:
+        description: "Name of the Azure Web App"
+        type: string
+        required: true
 
 jobs:
   # Get env if the action was triggered by a simple push
@@ -106,6 +110,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          app-name: ${{ inputs.app-name }} || ${{ secrets.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
           package: release.zip
