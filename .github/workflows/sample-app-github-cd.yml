@@ -33,8 +33,8 @@ jobs:
         id: get-env
         shell: bash
         run: |
-          if [ ${{ github.event_name}} == 'push']; then
-            if [ ${{ github.base_ref }} == 'sandbox' ]; then
+          if [ ${{ github.event_name}} == 'push' ]; then
+            if [ ${{ github.ref_name }} == 'sandbox' ]; then
               echo "env-to-use=sbx" >> "$GITHUB_OUTPUT"
             fi
           else 
