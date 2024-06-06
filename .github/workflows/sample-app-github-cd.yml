@@ -48,6 +48,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: keiro-be/keiro-private-chatgpt-app
+          ref: main
 
       - name: Set up Python version
         uses: actions/setup-python@v5
