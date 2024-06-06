@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           if [ ${{ github.event_name}} == 'push']; then
-            if [ ${{ github.base_ref }} == 'sandbox' ]; then
+            if [ ${{ github.ref_name }} == 'sandbox' ]; then
               echo "env-to-use=sbx" >> "$GITHUB_OUTPUT"
             fi
           else 
@@ -48,6 +48,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: keiro-be/keiro-private-chatgpt-app
+          ref: main
 
       - name: Set up Python version
         uses: actions/setup-python@v5
